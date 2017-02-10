@@ -1,0 +1,30 @@
+{
+  "name": "GoogleCalendar",
+  "id": "mtanda-google-calendar-datasource",
+  "type": "datasource",
+
+  "partials": {
+    "config": "public/app/plugins/datasource/simplejson/partials/config.html"
+  },
+
+  "metrics": false,
+  "annotations": true,
+
+  "info": {
+    "description": "google calendar datasource",
+    "author": {
+      "name": "Mitsuhiro Tanda"
+    },
+    "links": [
+      {"name": "GitHub", "url": "https://github.com/mtanda/grafana-google-calendar-datasource"},
+      {"name": "MIT License", "url": "https://github.com/mtanda/grafana-google-calendar-datasource/blob/master/LICENSE"}
+    ],
+    "version": "1.0.0",
+    "updated": "2017-02-10"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "3.x.x",
+    "plugins": [ ]
+  }
+}
