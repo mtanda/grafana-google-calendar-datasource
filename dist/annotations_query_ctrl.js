@@ -3,7 +3,7 @@
 System.register([], function (_export, _context) {
   "use strict";
 
-  var _createClass, GoogleCalendarAnnotationsQueryCtrl;
+  var GoogleCalendarAnnotationsQueryCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -14,49 +14,11 @@ System.register([], function (_export, _context) {
   return {
     setters: [],
     execute: function () {
-      _createClass = function () {
-        function defineProperties(target, props) {
-          for (var i = 0; i < props.length; i++) {
-            var descriptor = props[i];
-            descriptor.enumerable = descriptor.enumerable || false;
-            descriptor.configurable = true;
-            if ("value" in descriptor) descriptor.writable = true;
-            Object.defineProperty(target, descriptor.key, descriptor);
-          }
-        }
+      _export('GoogleCalendarAnnotationsQueryCtrl', GoogleCalendarAnnotationsQueryCtrl = function GoogleCalendarAnnotationsQueryCtrl($scope, $injector) {
+        _classCallCheck(this, GoogleCalendarAnnotationsQueryCtrl);
 
-        return function (Constructor, protoProps, staticProps) {
-          if (protoProps) defineProperties(Constructor.prototype, protoProps);
-          if (staticProps) defineProperties(Constructor, staticProps);
-          return Constructor;
-        };
-      }();
-
-      _export('GoogleCalendarAnnotationsQueryCtrl', GoogleCalendarAnnotationsQueryCtrl = function () {
-        function GoogleCalendarAnnotationsQueryCtrl($scope, $injector) {
-          _classCallCheck(this, GoogleCalendarAnnotationsQueryCtrl);
-
-          this.scope = $scope;
-          var self = this;
-          gapi.load('client:auth2', function () {
-            gapi.auth2.init({ client_id: self.datasource.clientId, scope: self.datasource.scopes });
-          });
-        }
-
-        _createClass(GoogleCalendarAnnotationsQueryCtrl, [{
-          key: 'handleAuthClick',
-          value: function handleAuthClick(event) {
-            gapi.auth2.getAuthInstance().signIn();
-          }
-        }, {
-          key: 'handleSignoutClick',
-          value: function handleSignoutClick(event) {
-            gapi.auth2.getAuthInstance().signOut();
-          }
-        }]);
-
-        return GoogleCalendarAnnotationsQueryCtrl;
-      }());
+        this.scope = $scope;
+      });
 
       _export('GoogleCalendarAnnotationsQueryCtrl', GoogleCalendarAnnotationsQueryCtrl);
 
