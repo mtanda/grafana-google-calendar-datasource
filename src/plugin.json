@@ -19,6 +19,9 @@
       {"name": "GitHub", "url": "https://github.com/mtanda/grafana-google-calendar-datasource"},
       {"name": "MIT License", "url": "https://github.com/mtanda/grafana-google-calendar-datasource/blob/master/LICENSE"}
     ],
+    "screenshots": [
+      {"name": "Calendar", "path": "images/calendar.png"}
+    ],
     "version": "1.0.0",
     "updated": "2017-02-10"
   },
