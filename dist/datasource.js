@@ -86,6 +86,9 @@ System.register(['lodash', 'moment', './libs/api'], function (_export, _context)
                   self.initialized = true;
                   return onSuccess();
                 }
+              }, function (err) {
+                console.log(err);
+                return onFail('failed to init');
               });
             });
           }

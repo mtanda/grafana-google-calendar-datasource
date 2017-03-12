@@ -46,6 +46,9 @@ export class GoogleCalendarDatasource {
           self.initialized = true;
           return onSuccess();
         }
+      }, function(err) {
+        console.log(err);
+        return onFail('failed to init');
       });
     });
   }
