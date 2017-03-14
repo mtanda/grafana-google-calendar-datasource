@@ -15,8 +15,31 @@ export class GoogleCalendarDatasource {
     this.initialized = false;
   }
 
+  load(onSuccess) {
+    if (gapi.client) {
+      return onSuccess();
+    }
+    gapi.load('client:auth2', function () {
+      onSuccess();
+    });
+  }
+
   testDatasource() {
-    return true;
+    var deferred = this.q.defer();
+    var self = this;
+    self.load(function () {
+      gapi.client.init({
+        clientId: self.clientId,
+        scope: self.scopes,
+        discoveryDocs: self.discoveryDocs
+      }).then(function () {
+        deferred.resolve({ status: 'success', message: 'Data source is working', title: 'Success' });
+      }, function(err) {
+        console.log(err);
+        deferred.reject({ message: err.details });
+      });
+    });
+    return deferred.promise;
   }
 
   initialize(onSuccess, onFail) {
@@ -25,7 +48,7 @@ export class GoogleCalendarDatasource {
       return onSuccess();
     }
 
-    gapi.load('client:auth2', function () {
+    self.load(function () {
       gapi.client.init({
         clientId: self.clientId,
         scope: self.scopes,
