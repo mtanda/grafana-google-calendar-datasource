@@ -53,9 +53,33 @@ System.register(['lodash', 'moment', './libs/api'], function (_export, _context)
         }
 
         _createClass(GoogleCalendarDatasource, [{
+          key: 'load',
+          value: function load(onSuccess) {
+            if (gapi.client) {
+              return onSuccess();
+            }
+            gapi.load('client:auth2', function () {
+              onSuccess();
+            });
+          }
+        }, {
           key: 'testDatasource',
           value: function testDatasource() {
-            return true;
+            var deferred = this.q.defer();
+            var self = this;
+            self.load(function () {
+              gapi.client.init({
+                clientId: self.clientId,
+                scope: self.scopes,
+                discoveryDocs: self.discoveryDocs
+              }).then(function () {
+                deferred.resolve({ status: 'success', message: 'Data source is working', title: 'Success' });
+              }, function (err) {
+                console.log(err);
+                deferred.reject({ message: err.details });
+              });
+            });
+            return deferred.promise;
           }
         }, {
           key: 'initialize',
@@ -65,7 +89,7 @@ System.register(['lodash', 'moment', './libs/api'], function (_export, _context)
               return onSuccess();
             }
 
-            gapi.load('client:auth2', function () {
+            self.load(function () {
               gapi.client.init({
                 clientId: self.clientId,
                 scope: self.scopes,
