@@ -109,14 +109,14 @@ export class GoogleCalendarDatasource {
                 time: start.valueOf(),
                 title: event.summary,
                 tags: ['start'],
-                text: event.summary
+                text: event.description
               },
               {
                 annotation: annotation,
                 time: end.valueOf(),
                 title: event.summary,
                 tags: ['end'],
-                text: event.summary
+                text: event.description
               }
             ];
           }).flatten().value();
