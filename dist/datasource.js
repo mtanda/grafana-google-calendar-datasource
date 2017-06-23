@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['lodash', 'moment', './libs/api'], function (_export, _context) {
+System.register(['lodash', 'moment', './libs/script.js'], function (_export, _context) {
   "use strict";
 
-  var _, moment, gpai, _createClass, GoogleCalendarDatasource;
+  var _, moment, scriptjs, _createClass, GoogleCalendarDatasource;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -16,8 +16,8 @@ System.register(['lodash', 'moment', './libs/api'], function (_export, _context)
       _ = _lodash.default;
     }, function (_moment) {
       moment = _moment.default;
-    }, function (_libsApi) {
-      gpai = _libsApi.default;
+    }, function (_libsScriptJs) {
+      scriptjs = _libsScriptJs.default;
     }],
     execute: function () {
       _createClass = function () {
@@ -89,30 +89,32 @@ System.register(['lodash', 'moment', './libs/api'], function (_export, _context)
               return onSuccess();
             }
 
-            self.load(function () {
-              gapi.client.init({
-                clientId: self.clientId,
-                scope: self.scopes,
-                discoveryDocs: self.discoveryDocs
-              }).then(function () {
-                var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-                if (!isSignedIn) {
-                  gapi.auth2.getAuthInstance().isSignedIn.listen(function (success) {
-                    if (success) {
-                      self.initialized = true;
-                      return onSuccess();
-                    } else {
-                      return onFail('failed to sign-in');
-                    }
-                  });
-                  gapi.auth2.getAuthInstance().signIn();
-                } else {
-                  self.initialized = true;
-                  return onSuccess();
-                }
-              }, function (err) {
-                console.log(err);
-                return onFail('failed to init');
+            scriptjs('https://apis.google.com/js/api.js', function () {
+              self.load(function () {
+                gapi.client.init({
+                  clientId: self.clientId,
+                  scope: self.scopes,
+                  discoveryDocs: self.discoveryDocs
+                }).then(function () {
+                  var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+                  if (!isSignedIn) {
+                    gapi.auth2.getAuthInstance().isSignedIn.listen(function (success) {
+                      if (success) {
+                        self.initialized = true;
+                        return onSuccess();
+                      } else {
+                        return onFail('failed to sign-in');
+                      }
+                    });
+                    gapi.auth2.getAuthInstance().signIn();
+                  } else {
+                    self.initialized = true;
+                    return onSuccess();
+                  }
+                }, function (err) {
+                  console.log(err);
+                  return onFail('failed to init');
+                });
               });
             });
           }
