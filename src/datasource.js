@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import gpai from './libs/api';
+import scriptjs from './libs/script.js';
 
 export class GoogleCalendarDatasource {
 
@@ -48,30 +48,32 @@ export class GoogleCalendarDatasource {
       return onSuccess();
     }
 
-    self.load(function () {
-      gapi.client.init({
-        clientId: self.clientId,
-        scope: self.scopes,
-        discoveryDocs: self.discoveryDocs
-      }).then(function () {
-        var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-        if (!isSignedIn) {
-          gapi.auth2.getAuthInstance().isSignedIn.listen(function (success) {
-            if (success) {
-              self.initialized = true;
-              return onSuccess();
-            } else {
-              return onFail('failed to sign-in');
-            }
-          });
-          gapi.auth2.getAuthInstance().signIn();
-        } else {
-          self.initialized = true;
-          return onSuccess();
-        }
-      }, function(err) {
-        console.log(err);
-        return onFail('failed to init');
+    scriptjs('https://apis.google.com/js/api.js', function () {
+      self.load(function () {
+        gapi.client.init({
+          clientId: self.clientId,
+          scope: self.scopes,
+          discoveryDocs: self.discoveryDocs
+        }).then(function () {
+          var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+          if (!isSignedIn) {
+            gapi.auth2.getAuthInstance().isSignedIn.listen(function (success) {
+              if (success) {
+                self.initialized = true;
+                return onSuccess();
+              } else {
+                return onFail('failed to sign-in');
+              }
+            });
+            gapi.auth2.getAuthInstance().signIn();
+          } else {
+            self.initialized = true;
+            return onSuccess();
+          }
+        }, function (err) {
+          console.log(err);
+          return onFail('failed to init');
+        });
       });
     });
   }
