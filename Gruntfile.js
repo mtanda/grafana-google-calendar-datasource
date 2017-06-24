@@ -48,6 +48,15 @@ module.exports = function(grunt) {
           ext:'.js'
         }]
       },
+      distNoSystemJs: {
+        files: [{
+          cwd: 'src',
+          expand: true,
+          src: ['**/libs/script.js'],
+          dest: 'dist',
+          ext:'.js'
+        }]
+      },
       distTestNoSystemJs: {
         files: [{
           cwd: 'src',
