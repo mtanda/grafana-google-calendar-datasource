@@ -22,8 +22,8 @@
     "screenshots": [
       {"name": "Calendar", "path": "images/calendar.png"}
     ],
-    "version": "1.0.0",
-    "updated": "2017-02-10"
+    "version": "1.0.1",
+    "updated": "2017-06-26"
   },
 
   "dependencies": {
