@@ -15,65 +15,52 @@ export class GoogleCalendarDatasource {
     this.initialized = false;
   }
 
-  load(onSuccess) {
-    if (gapi.client) {
-      return onSuccess();
-    }
-    gapi.load('client:auth2', function () {
-      onSuccess();
-    });
-  }
-
-  testDatasource() {
-    var deferred = this.q.defer();
-    var self = this;
-    self.load(function () {
-      gapi.client.init({
-        clientId: self.clientId,
-        scope: self.scopes,
-        discoveryDocs: self.discoveryDocs
-      }).then(function () {
-        deferred.resolve({ status: 'success', message: 'Data source is working', title: 'Success' });
-      }, function(err) {
-        console.log(err);
-        deferred.reject({ message: err.details });
+  load() {
+    let deferred = this.q.defer();
+    scriptjs('https://apis.google.com/js/api.js', () => {
+      gapi.load('client:auth2', () => {
+        return deferred.resolve();
       });
     });
     return deferred.promise;
   }
 
-  initialize(onSuccess, onFail) {
-    var self = this;
-    if (self.initialized) {
-      return onSuccess();
+  testDatasource() {
+    return this.initialize().then(() => {
+      return { status: 'success', message: 'Data source is working', title: 'Success' };
+    }).catch(err => {
+      console.log(err);
+      return { status: "error", message: err.message, title: "Error" };
+    });
+  }
+
+  initialize() {
+    if (this.initialized) {
+      return Promise.resolve(gapi.auth2.getAuthInstance().currentUser.get());
     }
 
-    scriptjs('https://apis.google.com/js/api.js', function () {
-      self.load(function () {
-        gapi.client.init({
-          clientId: self.clientId,
-          scope: self.scopes,
-          discoveryDocs: self.discoveryDocs
-        }).then(function () {
-          var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-          if (!isSignedIn) {
-            gapi.auth2.getAuthInstance().isSignedIn.listen(function (success) {
-              if (success) {
-                self.initialized = true;
-                return onSuccess();
-              } else {
-                return onFail('failed to sign-in');
-              }
-            });
-            gapi.auth2.getAuthInstance().signIn();
-          } else {
-            self.initialized = true;
-            return onSuccess();
-          }
-        }, function (err) {
-          console.log(err);
-          return onFail('failed to init');
+    return this.load().then(() => {
+      return gapi.client.init({
+        clientId: this.clientId,
+        scope: this.scopes,
+        discoveryDocs: this.discoveryDocs
+      }).then(() => {
+        let authInstance = gapi.auth2.getAuthInstance();
+        if (!authInstance) {
+          throw { message: 'failed to initialize' };
+        }
+        let isSignedIn = authInstance.isSignedIn.get();
+        if (isSignedIn) {
+          this.initialized = true;
+          return authInstance.currentUser.get();
+        }
+        return authInstance.signIn().then(user => {
+          this.initialized = true;
+          return user;
         });
+      }, err => {
+        console.log(err);
+        throw { message: 'failed to initialize' };
       });
     });
   }
@@ -81,14 +68,12 @@ export class GoogleCalendarDatasource {
   annotationQuery(options) {
     var annotation = options.annotation;
     var calendarId = annotation.calendarId;
-    var deferred = this.q.defer();
 
     if (_.isEmpty(calendarId)) {
-      return deferred.resolve([]);
+      return this.q.when([]);
     }
 
-    var self = this;
-    self.initialize(function () {
+    return this.initialize().then(() => {
       gapi.client.calendar.events.list({
         'calendarId': calendarId,
         'timeMin': options.range.from.toISOString(),
@@ -97,11 +82,11 @@ export class GoogleCalendarDatasource {
         'singleEvents': true,
         'maxResults': 250,
         'orderBy': 'startTime'
-      }).then(function (response) {
+      }).then((response) => {
         var events = response.result.items;
 
         var result = _.chain(events)
-          .map(function (event) {
+          .map((event) => {
             var start = moment(event.start.dateTime || event.start.date);
             var end = moment(event.end.dateTime || event.end.date);
 
@@ -123,13 +108,8 @@ export class GoogleCalendarDatasource {
             ];
           }).flatten().value();
 
-        deferred.resolve(result);
+        return result;
       });
-    }, function (err) {
-      console.log(err);
-      deferred.reject(err);
     });
-
-    return deferred.promise;
   }
 }
