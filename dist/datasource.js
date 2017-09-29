@@ -54,67 +54,56 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
 
         _createClass(GoogleCalendarDatasource, [{
           key: 'load',
-          value: function load(onSuccess) {
-            if (gapi.client) {
-              return onSuccess();
-            }
-            gapi.load('client:auth2', function () {
-              onSuccess();
-            });
-          }
-        }, {
-          key: 'testDatasource',
-          value: function testDatasource() {
+          value: function load() {
             var deferred = this.q.defer();
-            var self = this;
-            self.load(function () {
-              gapi.client.init({
-                clientId: self.clientId,
-                scope: self.scopes,
-                discoveryDocs: self.discoveryDocs
-              }).then(function () {
-                deferred.resolve({ status: 'success', message: 'Data source is working', title: 'Success' });
-              }, function (err) {
-                console.log(err);
-                deferred.reject({ message: err.details });
+            scriptjs('https://apis.google.com/js/api.js', function () {
+              gapi.load('client:auth2', function () {
+                return deferred.resolve();
               });
             });
             return deferred.promise;
           }
         }, {
+          key: 'testDatasource',
+          value: function testDatasource() {
+            return this.initialize().then(function () {
+              return { status: 'success', message: 'Data source is working', title: 'Success' };
+            }).catch(function (err) {
+              console.log(err);
+              return { status: "error", message: err.message, title: "Error" };
+            });
+          }
+        }, {
           key: 'initialize',
-          value: function initialize(onSuccess, onFail) {
-            var self = this;
-            if (self.initialized) {
-              return onSuccess();
+          value: function initialize() {
+            var _this = this;
+
+            if (this.initialized) {
+              return Promise.resolve(gapi.auth2.getAuthInstance().currentUser.get());
             }
 
-            scriptjs('https://apis.google.com/js/api.js', function () {
-              self.load(function () {
-                gapi.client.init({
-                  clientId: self.clientId,
-                  scope: self.scopes,
-                  discoveryDocs: self.discoveryDocs
-                }).then(function () {
-                  var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-                  if (!isSignedIn) {
-                    gapi.auth2.getAuthInstance().isSignedIn.listen(function (success) {
-                      if (success) {
-                        self.initialized = true;
-                        return onSuccess();
-                      } else {
-                        return onFail('failed to sign-in');
-                      }
-                    });
-                    gapi.auth2.getAuthInstance().signIn();
-                  } else {
-                    self.initialized = true;
-                    return onSuccess();
-                  }
-                }, function (err) {
-                  console.log(err);
-                  return onFail('failed to init');
+            return this.load().then(function () {
+              return gapi.client.init({
+                clientId: _this.clientId,
+                scope: _this.scopes,
+                discoveryDocs: _this.discoveryDocs
+              }).then(function () {
+                var authInstance = gapi.auth2.getAuthInstance();
+                if (!authInstance) {
+                  throw { message: 'failed to initialize' };
+                }
+                var isSignedIn = authInstance.isSignedIn.get();
+                if (isSignedIn) {
+                  _this.initialized = true;
+                  return authInstance.currentUser.get();
+                }
+                return authInstance.signIn().then(function (user) {
+                  _this.initialized = true;
+                  return user;
                 });
+              }, function (err) {
+                console.log(err);
+                throw { message: 'failed to initialize' };
               });
             });
           }
@@ -123,14 +112,12 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
           value: function annotationQuery(options) {
             var annotation = options.annotation;
             var calendarId = annotation.calendarId;
-            var deferred = this.q.defer();
 
             if (_.isEmpty(calendarId)) {
-              return deferred.resolve([]);
+              return this.q.when([]);
             }
 
-            var self = this;
-            self.initialize(function () {
+            return this.initialize().then(function () {
               gapi.client.calendar.events.list({
                 'calendarId': calendarId,
                 'timeMin': options.range.from.toISOString(),
@@ -161,14 +148,9 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   }];
                 }).flatten().value();
 
-                deferred.resolve(result);
+                return result;
               });
-            }, function (err) {
-              console.log(err);
-              deferred.reject(err);
             });
-
-            return deferred.promise;
           }
         }]);
 
