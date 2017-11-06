@@ -118,7 +118,7 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
             }
 
             return this.initialize().then(function () {
-              gapi.client.calendar.events.list({
+              return gapi.client.calendar.events.list({
                 'calendarId': calendarId,
                 'timeMin': options.range.from.toISOString(),
                 'timeMax': options.range.to.toISOString(),
