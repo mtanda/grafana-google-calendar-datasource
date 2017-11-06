@@ -74,7 +74,7 @@ export class GoogleCalendarDatasource {
     }
 
     return this.initialize().then(() => {
-      gapi.client.calendar.events.list({
+      return gapi.client.calendar.events.list({
         'calendarId': calendarId,
         'timeMin': options.range.from.toISOString(),
         'timeMax': options.range.to.toISOString(),
