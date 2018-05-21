@@ -8,7 +8,7 @@ export class GoogleCalendarDatasource {
     this.type = instanceSettings.type;
     this.name = instanceSettings.name;
     this.id = instanceSettings.id;
-    this.access = instanceSettings.jsonData.access;
+    this.access = instanceSettings.jsonData.access || 'direct';
     this.clientId = instanceSettings.jsonData.clientId;
     this.scopes = 'https://www.googleapis.com/auth/calendar.readonly';
     this.discoveryDocs = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
