@@ -19,13 +19,15 @@ type GoogleCalendarDatasource struct {
 }
 
 type EventsListRequest struct {
-	CalendarId   string
-	TimeMin      string
-	TimeMax      string
-	ShowDeleted  bool
-	SingleEvents bool
-	MaxResults   int64
-	OrderBy      string
+	CalendarId             string
+	TimeMin                string
+	TimeMax                string
+	OrderBy                string
+	Q                      string
+	SharedExtendedProperty string
+	ShowDeleted            bool
+	SingleEvents           bool
+	MaxResults             int64
 }
 
 func (t *GoogleCalendarDatasource) Query(ctx context.Context, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
@@ -62,6 +64,12 @@ func (t *GoogleCalendarDatasource) Query(ctx context.Context, tsdbReq *datasourc
 	eventsListCall := calendarService.Events.List(req.CalendarId).
 		TimeMin(req.TimeMin).TimeMax(req.TimeMax).ShowDeleted(req.ShowDeleted).
 		SingleEvents(req.SingleEvents).MaxResults(req.MaxResults).OrderBy(req.OrderBy)
+	if req.Q != "" {
+		eventsListCall = eventsListCall.Q(req.Q)
+	}
+	if req.SharedExtendedProperty != "" {
+		eventsListCall = eventsListCall.SharedExtendedProperty(req.SharedExtendedProperty)
+	}
 	events, err := eventsListCall.Do()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to retrieve events: %v", err)
