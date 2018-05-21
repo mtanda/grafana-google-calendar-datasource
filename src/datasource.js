@@ -101,13 +101,13 @@ export class GoogleCalendarDatasource {
         });
       }
 
-      let fromToQuery = query.match(/^(from|to)\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
-      if (fromToQuery) {
-        let key = fromToQuery[1] === 'from' ? 'start' : 'end';
-        let calendarId = fromToQuery[3];
-        let format = fromToQuery[4];
-        let offset = parseInt(fromToQuery[5], 10);
-        let filter = fromToQuery[6];
+      let startEndQuery = query.match(/^(start|end)\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
+      if (startEndQuery) {
+        let key = startEndQuery[1] === 'start' ? 'start' : 'end';
+        let calendarId = startEndQuery[3];
+        let format = startEndQuery[4];
+        let offset = parseInt(startEndQuery[5], 10);
+        let filter = startEndQuery[6];
         let params = {
           'calendarId': calendarId,
           'timeMin': timeRange.from.toISOString(),

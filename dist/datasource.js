@@ -147,13 +147,13 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                 });
               }
 
-              var fromToQuery = query.match(/^(from|to)\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
-              if (fromToQuery) {
-                var _key = fromToQuery[1] === 'from' ? 'start' : 'end';
-                var _calendarId = fromToQuery[3];
-                var format = fromToQuery[4];
-                var offset = parseInt(fromToQuery[5], 10);
-                var _filter = fromToQuery[6];
+              var startEndQuery = query.match(/^(start|end)\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
+              if (startEndQuery) {
+                var _key = startEndQuery[1] === 'start' ? 'start' : 'end';
+                var _calendarId = startEndQuery[3];
+                var format = startEndQuery[4];
+                var offset = parseInt(startEndQuery[5], 10);
+                var _filter = startEndQuery[6];
                 var _params = {
                   'calendarId': _calendarId,
                   'timeMin': timeRange.from.toISOString(),
