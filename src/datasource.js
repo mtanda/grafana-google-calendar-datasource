@@ -4,14 +4,17 @@ import scriptjs from './libs/script.js';
 
 export class GoogleCalendarDatasource {
 
-  constructor(instanceSettings, $q, templateSrv) {
+  constructor(instanceSettings, $q, templateSrv, backendSrv) {
     this.type = instanceSettings.type;
     this.name = instanceSettings.name;
+    this.id = instanceSettings.id;
+    this.access = instanceSettings.jsonData.access || 'direct';
     this.clientId = instanceSettings.jsonData.clientId;
     this.scopes = 'https://www.googleapis.com/auth/calendar.readonly';
     this.discoveryDocs = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
     this.q = $q;
     this.templateSrv = templateSrv;
+    this.backendSrv = backendSrv;
     this.initialized = false;
   }
 
@@ -35,6 +38,9 @@ export class GoogleCalendarDatasource {
   }
 
   initialize() {
+    if (this.access == 'proxy') {
+      return Promise.resolve([]);
+    }
     if (this.initialized) {
       return Promise.resolve(gapi.auth2.getAuthInstance().currentUser.get());
     }
@@ -74,16 +80,36 @@ export class GoogleCalendarDatasource {
     }
 
     return this.initialize().then(() => {
-      return gapi.client.calendar.events.list({
-        'calendarId': calendarId,
-        'timeMin': options.range.from.toISOString(),
-        'timeMax': options.range.to.toISOString(),
-        'showDeleted': false,
-        'singleEvents': true,
-        'maxResults': 250,
-        'orderBy': 'startTime'
-      }).then((response) => {
-        var events = response.result.items;
+      return (() => {
+        let params = {
+          'calendarId': calendarId,
+          'timeMin': options.range.from.toISOString(),
+          'timeMax': options.range.to.toISOString(),
+          'showDeleted': false,
+          'singleEvents': true,
+          'maxResults': 250,
+          'orderBy': 'startTime'
+        };
+        if (this.access != 'proxy') {
+          return gapi.client.calendar.events.list(params);
+        } else {
+          return this.backendSrv.datasourceRequest({
+            url: '/api/tsdb/query',
+            method: 'POST',
+            data: {
+              queries: [
+                _.extend({
+                  queryType: 'raw',
+                  api: 'calendar.events.list',
+                  refId: '',
+                  datasourceId: this.id
+                }, params)
+              ]
+            }
+          });
+        }
+      })().then((response) => {
+        var events = this.access != 'proxy' ? response.result.items : response.data.results[''].meta.items;
 
         var result = _.chain(events)
           .map((event) => {

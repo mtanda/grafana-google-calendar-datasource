@@ -9,6 +9,8 @@
 
   "metrics": false,
   "annotations": true,
+  "backend": true,
+  "executable": "google-calendar-plugin",
 
   "info": {
     "description": "google calendar datasource",
