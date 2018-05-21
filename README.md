@@ -26,6 +26,16 @@ At first time, you need to accept to open this popup window, and accept to use A
 
 ![](https://cloud.githubusercontent.com/assets/224552/23993102/a0580e2e-0a82-11e7-8e43-8e47973e2a97.png)
 
+### Templating
+
+#### Query variable
+
+Name | Description
+---- | --------
+*events(calendar_id, field_path, filter)* | Returns a list of field value matching the `filter`.
+*start(calendar_id, format, offset, filter)* | Returns a list of start timestamp matching the `filter` and offset.
+*end(calendar_id, format, offset, filter)* | Returns a list of end timestamp matching the `filter` and offset.
+*range(calendar_id, format, offset, filter)* | Returns a list of range for the event matching the `filter` and offset.
 ------
 
 #### Changelog
