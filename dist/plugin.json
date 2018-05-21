@@ -7,7 +7,7 @@
     "config": "public/app/plugins/datasource/mtanda-google-calendar-datasource/partials/config.html"
   },
 
-  "metrics": false,
+  "metrics": true,
   "annotations": true,
   "backend": true,
   "executable": "google-calendar-plugin",

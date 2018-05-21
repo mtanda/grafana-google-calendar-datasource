@@ -39,7 +39,7 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
       }();
 
       _export('GoogleCalendarDatasource', GoogleCalendarDatasource = function () {
-        function GoogleCalendarDatasource(instanceSettings, $q, templateSrv, backendSrv) {
+        function GoogleCalendarDatasource(instanceSettings, $q, templateSrv, timeSrv, backendSrv) {
           _classCallCheck(this, GoogleCalendarDatasource);
 
           this.type = instanceSettings.type;
@@ -51,6 +51,7 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
           this.discoveryDocs = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
           this.q = $q;
           this.templateSrv = templateSrv;
+          this.timeSrv = timeSrv;
           this.backendSrv = backendSrv;
           this.initialized = false;
         }
@@ -114,9 +115,142 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
             });
           }
         }, {
+          key: 'metricFindQuery',
+          value: function metricFindQuery(query) {
+            var _this2 = this;
+
+            return this.initialize().then(function () {
+              var timeRange = _this2.timeSrv.timeRange();
+              var eventsQuery = query.match(/^events\((([^,]+), *)?([^,]+), *([^,]+)\)/);
+              if (eventsQuery) {
+                var calendarId = eventsQuery[2];
+                var fieldPath = eventsQuery[3];
+                var filter = eventsQuery[4];
+                var params = {
+                  'calendarId': calendarId,
+                  'timeMin': timeRange.from.toISOString(),
+                  'timeMax': timeRange.to.toISOString(),
+                  'orderBy': 'startTime',
+                  'showDeleted': false,
+                  'singleEvents': true,
+                  'maxResults': 250
+                };
+                if (filter.indexOf('=') >= 0) {
+                  params.sharedExtendedProperty = filter;
+                } else {
+                  params.q = filter;
+                }
+                return _this2.getEvents(params).then(function (events) {
+                  return _this2.q.when(events.map(function (event) {
+                    return { text: _.get(event, fieldPath) };
+                  }));
+                });
+              }
+
+              var fromToQuery = query.match(/^(from|to)\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
+              if (fromToQuery) {
+                var _key = fromToQuery[1] === 'from' ? 'start' : 'end';
+                var _calendarId = fromToQuery[3];
+                var format = fromToQuery[4];
+                var offset = parseInt(fromToQuery[5], 10);
+                var _filter = fromToQuery[6];
+                var _params = {
+                  'calendarId': _calendarId,
+                  'timeMin': timeRange.from.toISOString(),
+                  'timeMax': timeRange.to.toISOString(),
+                  'orderBy': 'startTime',
+                  'showDeleted': false,
+                  'singleEvents': true,
+                  'maxResults': 250
+                };
+                if (_filter.indexOf('=') >= 0) {
+                  _params.sharedExtendedProperty = _filter;
+                } else {
+                  _params.q = _filter;
+                }
+                return _this2.getEvents(_params).then(function (events) {
+                  events.sort(function (a, b) {
+                    return (a[_key].dateTime || a[_key].date) > (b[_key].dateTime || b[_key].date);
+                  });
+                  var lastIndex = events.findIndex(function (event) {
+                    return moment(event.start.dateTime || event.start.date) < moment();
+                  });
+                  if (lastIndex === -1) {
+                    return {};
+                  }
+                  var index = lastIndex + offset;
+                  if (index < 0 || index >= events.length) {
+                    return {};
+                  }
+                  var date = moment(events[index][_key].dateTime || events[index][_key].date);
+                  if (format === 'offset' || format === '-offset') {
+                    date = Math.floor(moment.duration(timeRange.to.diff(date)).asSeconds());
+                    if (format === 'offset') {
+                      date = -date;
+                    }
+                    date = date + 's';
+                  } else {
+                    date = date.format(format);
+                  }
+                  return [{ text: date }];
+                });
+              }
+
+              var rangeQuery = query.match(/^range\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
+              if (rangeQuery) {
+                var _calendarId2 = rangeQuery[2];
+                var _format = rangeQuery[3];
+                var _offset = parseInt(rangeQuery[4], 10);
+                var _filter2 = rangeQuery[5];
+                var _params2 = {
+                  'calendarId': _calendarId2,
+                  'timeMin': timeRange.from.toISOString(),
+                  'timeMax': timeRange.to.toISOString(),
+                  'orderBy': 'startTime',
+                  'showDeleted': false,
+                  'singleEvents': true,
+                  'maxResults': 250
+                };
+                if (_filter2.indexOf('=') >= 0) {
+                  _params2.sharedExtendedProperty = _filter2;
+                } else {
+                  _params2.q = _filter2;
+                }
+                return _this2.getEvents(_params2).then(function (events) {
+                  events.sort(function (a, b) {
+                    return (a[key].dateTime || a[key].date) > (b[key].dateTime || b[key].date);
+                  });
+                  var lastIndex = events.findIndex(function (event) {
+                    return moment(event.start.dateTime || event.start.date) < moment();
+                  });
+                  if (lastIndex === -1) {
+                    return {};
+                  }
+                  var index = lastIndex + _offset;
+                  if (index < 0 || index >= events.length) {
+                    return {};
+                  }
+                  var end = moment(events[index].end.dateTime || events[index].end.date);
+                  var start = moment(events[index].start.dateTime || events[index].start.date);
+                  var range = '';
+                  if (_format === 'offset' || _format === '-offset') {
+                    range = Math.floor(moment.duration(end.diff(start)).asSeconds());
+                    if (_format === 'offset') {
+                      range = -range;
+                    }
+                    range = range + 's';
+                  }
+                  return [{ text: range }];
+                });
+              }
+
+              return Promise.reject(new Error('Invalid query'));
+            });
+          }
+        }, {
           key: 'annotationQuery',
           value: function annotationQuery(options) {
-            var _this2 = this;
+            var _this3 = this;
 
             var annotation = options.annotation;
             var calendarId = annotation.calendarId;
@@ -131,30 +265,13 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   'calendarId': calendarId,
                   'timeMin': options.range.from.toISOString(),
                   'timeMax': options.range.to.toISOString(),
+                  'orderBy': 'startTime',
                   'showDeleted': false,
                   'singleEvents': true,
-                  'maxResults': 250,
-                  'orderBy': 'startTime'
+                  'maxResults': 250
                 };
-                if (_this2.access != 'proxy') {
-                  return gapi.client.calendar.events.list(params);
-                } else {
-                  return _this2.backendSrv.datasourceRequest({
-                    url: '/api/tsdb/query',
-                    method: 'POST',
-                    data: {
-                      queries: [_.extend({
-                        queryType: 'raw',
-                        api: 'calendar.events.list',
-                        refId: '',
-                        datasourceId: _this2.id
-                      }, params)]
-                    }
-                  });
-                }
-              }().then(function (response) {
-                var events = _this2.access != 'proxy' ? response.result.items : response.data.results[''].meta.items;
-
+                return _this3.getEvents(params);
+              }().then(function (events) {
                 var result = _.chain(events).map(function (event) {
                   var start = moment(event.start.dateTime || event.start.date);
                   var end = moment(event.end.dateTime || event.end.date);
@@ -178,6 +295,32 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
 
                 return result;
               });
+            });
+          }
+        }, {
+          key: 'getEvents',
+          value: function getEvents(params) {
+            var _this4 = this;
+
+            return function () {
+              if (_this4.access != 'proxy') {
+                return gapi.client.calendar.events.list(params);
+              } else {
+                return _this4.backendSrv.datasourceRequest({
+                  url: '/api/tsdb/query',
+                  method: 'POST',
+                  data: {
+                    queries: [_.extend({
+                      queryType: 'raw',
+                      api: 'calendar.events.list',
+                      refId: '',
+                      datasourceId: _this4.id
+                    }, params)]
+                  }
+                });
+              }
+            }().then(function (response) {
+              return _this4.access != 'proxy' ? response.result.items : response.data.results[''].meta.items;
             });
           }
         }]);
