@@ -85,15 +85,11 @@ export class GoogleCalendarDatasource {
           'timeMin': timeRange.from.toISOString(),
           'timeMax': timeRange.to.toISOString(),
           'orderBy': 'startTime',
+          'q': filter,
           'showDeleted': false,
           'singleEvents': true,
           'maxResults': 250,
         };
-        if (filter.indexOf('=') >= 0) {
-          params.sharedExtendedProperty = filter;
-        } else {
-          params.q = filter;
-        }
         return this.getEvents(params).then(events => {
           return this.q.when(events.map(event => {
             return { text: _.get(event, fieldPath) };
@@ -113,18 +109,14 @@ export class GoogleCalendarDatasource {
           'timeMin': timeRange.from.toISOString(),
           'timeMax': timeRange.to.toISOString(),
           'orderBy': 'startTime',
+          'q': filter,
           'showDeleted': false,
           'singleEvents': true,
           'maxResults': 250,
         };
-        if (filter.indexOf('=') >= 0) {
-          params.sharedExtendedProperty = filter;
-        } else {
-          params.q = filter;
-        }
         return this.getEvents(params).then(events => {
           events.sort((a, b) => {
-            return (a[key].dateTime || a[key].date) > (b[key].dateTime || b[key].date);
+            return moment(a[key].dateTime || a[key].date) > moment(b[key].dateTime || b[key].date);
           });
           let lastIndex = events.findIndex(event => {
             return moment(event.start.dateTime || event.start.date) < moment();
@@ -132,7 +124,7 @@ export class GoogleCalendarDatasource {
           if (lastIndex === -1) {
             return {};
           }
-          let index = lastIndex + offset;
+          let index = lastIndex - offset;
           if (index < 0 || index >= events.length) {
             return {};
           }
@@ -161,18 +153,14 @@ export class GoogleCalendarDatasource {
           'timeMin': timeRange.from.toISOString(),
           'timeMax': timeRange.to.toISOString(),
           'orderBy': 'startTime',
+          'q': filter,
           'showDeleted': false,
           'singleEvents': true,
           'maxResults': 250,
         };
-        if (filter.indexOf('=') >= 0) {
-          params.sharedExtendedProperty = filter;
-        } else {
-          params.q = filter;
-        }
         return this.getEvents(params).then(events => {
           events.sort((a, b) => {
-            return (a[key].dateTime || a[key].date) > (b[key].dateTime || b[key].date);
+            return moment(a[key].dateTime || a[key].date) > moment(b[key].dateTime || b[key].date);
           });
           let lastIndex = events.findIndex(event => {
             return moment(event.start.dateTime || event.start.date) < moment();
@@ -180,7 +168,7 @@ export class GoogleCalendarDatasource {
           if (lastIndex === -1) {
             return {};
           }
-          let index = lastIndex + offset;
+          let index = lastIndex - offset;
           if (index < 0 || index >= events.length) {
             return {};
           }
