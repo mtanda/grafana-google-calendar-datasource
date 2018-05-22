@@ -131,15 +131,11 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   'timeMin': timeRange.from.toISOString(),
                   'timeMax': timeRange.to.toISOString(),
                   'orderBy': 'startTime',
+                  'q': filter,
                   'showDeleted': false,
                   'singleEvents': true,
                   'maxResults': 250
                 };
-                if (filter.indexOf('=') >= 0) {
-                  params.sharedExtendedProperty = filter;
-                } else {
-                  params.q = filter;
-                }
                 return _this2.getEvents(params).then(function (events) {
                   return _this2.q.when(events.map(function (event) {
                     return { text: _.get(event, fieldPath) };
@@ -159,18 +155,14 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   'timeMin': timeRange.from.toISOString(),
                   'timeMax': timeRange.to.toISOString(),
                   'orderBy': 'startTime',
+                  'q': _filter,
                   'showDeleted': false,
                   'singleEvents': true,
                   'maxResults': 250
                 };
-                if (_filter.indexOf('=') >= 0) {
-                  _params.sharedExtendedProperty = _filter;
-                } else {
-                  _params.q = _filter;
-                }
                 return _this2.getEvents(_params).then(function (events) {
                   events.sort(function (a, b) {
-                    return (a[_key].dateTime || a[_key].date) > (b[_key].dateTime || b[_key].date);
+                    return moment(a[_key].dateTime || a[_key].date) > moment(b[_key].dateTime || b[_key].date);
                   });
                   var lastIndex = events.findIndex(function (event) {
                     return moment(event.start.dateTime || event.start.date) < moment();
@@ -178,7 +170,7 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   if (lastIndex === -1) {
                     return {};
                   }
-                  var index = lastIndex + offset;
+                  var index = lastIndex - offset;
                   if (index < 0 || index >= events.length) {
                     return {};
                   }
@@ -207,18 +199,14 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   'timeMin': timeRange.from.toISOString(),
                   'timeMax': timeRange.to.toISOString(),
                   'orderBy': 'startTime',
+                  'q': _filter2,
                   'showDeleted': false,
                   'singleEvents': true,
                   'maxResults': 250
                 };
-                if (_filter2.indexOf('=') >= 0) {
-                  _params2.sharedExtendedProperty = _filter2;
-                } else {
-                  _params2.q = _filter2;
-                }
                 return _this2.getEvents(_params2).then(function (events) {
                   events.sort(function (a, b) {
-                    return (a[key].dateTime || a[key].date) > (b[key].dateTime || b[key].date);
+                    return moment(a[key].dateTime || a[key].date) > moment(b[key].dateTime || b[key].date);
                   });
                   var lastIndex = events.findIndex(function (event) {
                     return moment(event.start.dateTime || event.start.date) < moment();
@@ -226,7 +214,7 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   if (lastIndex === -1) {
                     return {};
                   }
-                  var index = lastIndex + _offset;
+                  var index = lastIndex - _offset;
                   if (index < 0 || index >= events.length) {
                     return {};
                   }
