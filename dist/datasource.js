@@ -164,12 +164,7 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   events.sort(function (a, b) {
                     return moment(a[_key].dateTime || a[_key].date) > moment(b[_key].dateTime || b[_key].date);
                   });
-                  var lastIndex = events.findIndex(function (event) {
-                    return moment(event.start.dateTime || event.start.date) < moment();
-                  });
-                  if (lastIndex === -1) {
-                    return {};
-                  }
+                  var lastIndex = 0;
                   var index = lastIndex - offset;
                   if (index < 0 || index >= events.length) {
                     return {};
@@ -208,12 +203,7 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   events.sort(function (a, b) {
                     return moment(a[key].dateTime || a[key].date) > moment(b[key].dateTime || b[key].date);
                   });
-                  var lastIndex = events.findIndex(function (event) {
-                    return moment(event.start.dateTime || event.start.date) < moment();
-                  });
-                  if (lastIndex === -1) {
-                    return {};
-                  }
+                  var lastIndex = 0;
                   var index = lastIndex - _offset;
                   if (index < 0 || index >= events.length) {
                     return {};
