@@ -118,12 +118,7 @@ export class GoogleCalendarDatasource {
           events.sort((a, b) => {
             return moment(a[key].dateTime || a[key].date) > moment(b[key].dateTime || b[key].date);
           });
-          let lastIndex = events.findIndex(event => {
-            return moment(event.start.dateTime || event.start.date) < moment();
-          });
-          if (lastIndex === -1) {
-            return {};
-          }
+          let lastIndex = 0;
           let index = lastIndex - offset;
           if (index < 0 || index >= events.length) {
             return {};
@@ -162,12 +157,7 @@ export class GoogleCalendarDatasource {
           events.sort((a, b) => {
             return moment(a[key].dateTime || a[key].date) > moment(b[key].dateTime || b[key].date);
           });
-          let lastIndex = events.findIndex(event => {
-            return moment(event.start.dateTime || event.start.date) < moment();
-          });
-          if (lastIndex === -1) {
-            return {};
-          }
+          let lastIndex = 0;
           let index = lastIndex - offset;
           if (index < 0 || index >= events.length) {
             return {};
