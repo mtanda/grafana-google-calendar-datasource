@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['lodash', 'moment', './libs/script.js'], function (_export, _context) {
+System.register(['lodash', 'moment', 'app/core/utils/datemath', './libs/script.js'], function (_export, _context) {
   "use strict";
 
-  var _, moment, scriptjs, _createClass, GoogleCalendarDatasource;
+  var _, moment, dateMath, scriptjs, _createClass, GoogleCalendarDatasource;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -16,6 +16,8 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
       _ = _lodash.default;
     }, function (_moment) {
       moment = _moment.default;
+    }, function (_appCoreUtilsDatemath) {
+      dateMath = _appCoreUtilsDatemath;
     }, function (_libsScriptJs) {
       scriptjs = _libsScriptJs.default;
     }],
@@ -220,6 +222,23 @@ System.register(['lodash', 'moment', './libs/script.js'], function (_export, _co
                   }
                   return [{ text: range }];
                 });
+              }
+
+              var dateMathQuery = query.match(/^datemath\(([^,]+), *([^,]+)\)/);
+              if (dateMathQuery) {
+                var expression = dateMathQuery[1];
+                var _format2 = dateMathQuery[2];
+                var date = dateMath.parse(expression, false);
+                if (_format2 === 'offset' || _format2 === '-offset') {
+                  date = Math.floor(moment.duration(timeRange.to.diff(date)).asSeconds());
+                  if (_format2 === 'offset') {
+                    date = -date;
+                  }
+                  date = date + 's';
+                } else {
+                  date = date.format(_format2);
+                }
+                return [{ text: date }];
               }
 
               return Promise.reject(new Error('Invalid query'));
