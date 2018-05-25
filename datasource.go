@@ -31,8 +31,6 @@ type EventsListRequest struct {
 }
 
 func (t *GoogleCalendarDatasource) Query(ctx context.Context, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
-	response := &datasource.DatasourceResponse{}
-
 	keyFilePath, ok := tsdbReq.Datasource.DecryptedSecureJsonData["serviceAccountKeyFilePath"]
 	if !ok {
 		return nil, fmt.Errorf("Unable to get service account key file path")
@@ -55,6 +53,12 @@ func (t *GoogleCalendarDatasource) Query(ctx context.Context, tsdbReq *datasourc
 	if err != nil {
 		return nil, fmt.Errorf("Unable to retrieve Calendar client: %v", err)
 	}
+
+	return t.handleRawQuery(calendarService, tsdbReq)
+}
+
+func (t *GoogleCalendarDatasource) handleRawQuery(calendarService *calendar.Service, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
+	response := &datasource.DatasourceResponse{}
 
 	var req EventsListRequest
 	if err := json.Unmarshal([]byte(tsdbReq.Queries[0].ModelJson), &req); err != nil {
