@@ -54,7 +54,17 @@ func (t *GoogleCalendarDatasource) Query(ctx context.Context, tsdbReq *datasourc
 		return nil, fmt.Errorf("Unable to retrieve Calendar client: %v", err)
 	}
 
-	return t.handleRawQuery(calendarService, tsdbReq)
+	response, err := t.handleRawQuery(calendarService, tsdbReq)
+	if err != nil {
+		return &datasource.DatasourceResponse{
+			Results: []*datasource.QueryResult{
+				&datasource.QueryResult{
+					Error: err.Error(),
+				},
+			},
+		}, nil
+	}
+	return response, nil
 }
 
 func (t *GoogleCalendarDatasource) handleRawQuery(calendarService *calendar.Service, tsdbReq *datasource.DatasourceRequest) (*datasource.DatasourceResponse, error) {
