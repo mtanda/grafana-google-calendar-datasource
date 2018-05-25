@@ -147,7 +147,7 @@ System.register(['lodash', 'moment', 'app/core/utils/datemath', './libs/script.j
 
               var startEndQuery = query.match(/^(start|end)\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
               if (startEndQuery) {
-                var _key = startEndQuery[1] === 'start' ? 'start' : 'end';
+                var key = startEndQuery[1] === 'start' ? 'start' : 'end';
                 var _calendarId = startEndQuery[3];
                 var format = startEndQuery[4];
                 var offset = parseInt(startEndQuery[5], 10);
@@ -164,14 +164,14 @@ System.register(['lodash', 'moment', 'app/core/utils/datemath', './libs/script.j
                 };
                 return _this2.getEvents(_params).then(function (events) {
                   events.sort(function (a, b) {
-                    return moment(a[_key].dateTime || a[_key].date) > moment(b[_key].dateTime || b[_key].date);
+                    return moment(a.start.dateTime || a.start.date) > moment(b.start.dateTime || b.start.date);
                   });
                   var lastIndex = 0;
                   var index = lastIndex - offset;
                   if (index < 0 || index >= events.length) {
                     return {};
                   }
-                  var date = moment(events[index][_key].dateTime || events[index][_key].date);
+                  var date = moment(events[index][key].dateTime || events[index][key].date);
                   if (format === 'offset' || format === '-offset') {
                     date = Math.floor(moment.duration(timeRange.to.diff(date)).asSeconds());
                     if (format === 'offset') {
@@ -203,7 +203,7 @@ System.register(['lodash', 'moment', 'app/core/utils/datemath', './libs/script.j
                 };
                 return _this2.getEvents(_params2).then(function (events) {
                   events.sort(function (a, b) {
-                    return moment(a[key].dateTime || a[key].date) > moment(b[key].dateTime || b[key].date);
+                    return moment(a.start.dateTime || a.start.date) > moment(b.start.dateTime || b.start.date);
                   });
                   var lastIndex = 0;
                   var index = lastIndex - _offset;
@@ -318,6 +318,18 @@ System.register(['lodash', 'moment', 'app/core/utils/datemath', './libs/script.j
               }
             }().then(function (response) {
               return _this4.access != 'proxy' ? response.result.items : response.data.results[''].meta.items;
+            }).catch(function (err) {
+              if (_this4.access != 'proxy') {
+                throw err;
+              } else {
+                throw {
+                  body: JSON.stringify({
+                    error: {
+                      message: err.data.results[""].error
+                    }
+                  })
+                };
+              }
             });
           }
         }]);

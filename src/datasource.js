@@ -271,6 +271,18 @@ export class GoogleCalendarDatasource {
       }
     })().then(response => {
       return this.access != 'proxy' ? response.result.items : response.data.results[''].meta.items;
+    }).catch(err => {
+      if (this.access != 'proxy') {
+        throw err;
+      } else {
+        throw {
+          body: JSON.stringify({
+            error: {
+              message: err.data.results[""].error
+            }
+          })
+        };
+      }
     });
   }
 }
