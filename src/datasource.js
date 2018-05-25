@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import * as dateMath from 'app/core/utils/datemath';
 import scriptjs from './libs/script.js';
 
 export class GoogleCalendarDatasource {
@@ -174,6 +175,23 @@ export class GoogleCalendarDatasource {
           }
           return [{ text: range }];
         });
+      }
+
+      let dateMathQuery = query.match(/^datemath\(([^,]+), *([^,]+)\)/);
+      if (dateMathQuery) {
+        let expression = dateMathQuery[1];
+        let format = dateMathQuery[2];
+        let date = dateMath.parse(expression, false);
+        if (format === 'offset' || format === '-offset') {
+          date = Math.floor(moment.duration(timeRange.to.diff(date)).asSeconds());
+          if (format === 'offset') {
+            date = -date;
+          }
+          date = date + 's';
+        } else {
+          date = date.format(format);
+        }
+        return [{ text: date }];
       }
 
       return Promise.reject(new Error('Invalid query'));
