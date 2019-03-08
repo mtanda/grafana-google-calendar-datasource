@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import * as dateMath from 'app/core/utils/datemath';
+import * as dateMath from 'grafana/app/core/utils/datemath';
 import scriptjs from './libs/script.js';
 
 export class GoogleCalendarDatasource {
