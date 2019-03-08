@@ -4,6 +4,18 @@ import * as dateMath from 'app/core/utils/datemath';
 import scriptjs from './libs/script.js';
 
 export class GoogleCalendarDatasource {
+  type: string;
+  name: string;
+  id: string;
+  access: string;
+  clientId: string;
+  scopes: string;
+  discoveryDocs: any;
+  q: any;
+  templateSrv: any;
+  timeSrv: any;
+  backendSrv: any;
+  initialized: boolean;
 
   constructor(instanceSettings, $q, templateSrv, timeSrv, backendSrv) {
     this.type = instanceSettings.type;
@@ -124,7 +136,7 @@ export class GoogleCalendarDatasource {
           if (index < 0 || index >= events.length) {
             return {};
           }
-          let date = moment(events[index][key].dateTime || events[index][key].date);
+          let date: any = moment(events[index][key].dateTime || events[index][key].date);
           if (format === 'offset' || format === '-offset') {
             date = Math.floor(moment.duration(timeRange.to.diff(date)).asSeconds());
             if (format === 'offset') {
@@ -165,7 +177,7 @@ export class GoogleCalendarDatasource {
           }
           let end = moment(events[index].end.dateTime || events[index].end.date);
           let start = moment(events[index].start.dateTime || events[index].start.date);
-          let range = '';
+          let range;
           if (format === 'offset' || format === '-offset') {
             range = Math.floor(moment.duration(end.diff(start)).asSeconds());
             if (format === 'offset') {

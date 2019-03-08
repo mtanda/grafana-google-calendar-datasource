@@ -1,8 +1,9 @@
-import {GoogleCalendarDatasource} from './datasource';
-import {GoogleCalendarAnnotationsQueryCtrl} from './annotations_query_ctrl';
+import { GoogleCalendarDatasource } from './datasource';
+import { GoogleCalendarAnnotationsQueryCtrl } from './annotations_query_ctrl';
 
-class GoogleCalendarConfigCtrl {}
-GoogleCalendarConfigCtrl.templateUrl = 'partials/config.html';
+class GoogleCalendarConfigCtrl {
+  static templateUrl = 'partials/config.html';
+}
 
 export {
   GoogleCalendarDatasource as Datasource,
