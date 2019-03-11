@@ -1,4 +1,4 @@
-define(["app/core/utils/datemath","lodash","moment"], function(__WEBPACK_EXTERNAL_MODULE_grafana_app_core_utils_datemath__, __WEBPACK_EXTERNAL_MODULE_lodash__, __WEBPACK_EXTERNAL_MODULE_moment__) { return /******/ (function(modules) { // webpackBootstrap
+define(["app/core/table_model","app/core/utils/datemath","app/plugins/sdk","lodash","moment"], function(__WEBPACK_EXTERNAL_MODULE_grafana_app_core_table_model__, __WEBPACK_EXTERNAL_MODULE_grafana_app_core_utils_datemath__, __WEBPACK_EXTERNAL_MODULE_grafana_app_plugins_sdk__, __WEBPACK_EXTERNAL_MODULE_lodash__, __WEBPACK_EXTERNAL_MODULE_moment__) { return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -281,6 +281,10 @@ var _datemath = __webpack_require__(/*! grafana/app/core/utils/datemath */ "graf
 
 var dateMath = _interopRequireWildcard(_datemath);
 
+var _table_model = __webpack_require__(/*! grafana/app/core/table_model */ "grafana/app/core/table_model");
+
+var _table_model2 = _interopRequireDefault(_table_model);
+
 var _scriptjs = __webpack_require__(/*! scriptjs */ "../node_modules/scriptjs/dist/script.js");
 
 var _scriptjs2 = _interopRequireDefault(_scriptjs);
@@ -374,6 +378,51 @@ function () {
         console.log(err);
         throw {
           message: 'failed to initialize'
+        };
+      });
+    });
+  };
+
+  GoogleCalendarDatasource.prototype.query = function (options) {
+    var _this = this;
+
+    return this.initialize().then(function () {
+      return Promise.all(options.targets.filter(function (t) {
+        return !t.hide;
+      }).map(function (t) {
+        var params = {
+          'calendarId': t.calendarId,
+          'timeMin': options.range.from.toISOString(),
+          'timeMax': options.range.to.toISOString(),
+          'orderBy': 'startTime',
+          'showDeleted': false,
+          'singleEvents': true,
+          'maxResults': 250
+        };
+        return _this.getEvents(params).then(function (events) {
+          return events.sort(function (a, b) {
+            return (0, _moment2.default)(a.start.dateTime || a.start.date) > (0, _moment2.default)(b.start.dateTime || b.start.date);
+          });
+        });
+      })).then(function (eventsList) {
+        var table = new _table_model2.default();
+        table.columns = ['startTime', 'endTime', 'summary', 'displayName', 'description'].map(function (c) {
+          return {
+            text: c
+          };
+        });
+
+        _lodash2.default.each(eventsList, function (events) {
+          _lodash2.default.each(events, function (event) {
+            var start = event.start.dateTime || event.start.date;
+            var end = event.end.dateTime || event.end.date;
+            var row = [start, end, event.summary, event.organizer.displayName, event.description || ''];
+            table.rows.push(row);
+          });
+        });
+
+        return {
+          data: [table]
         };
       });
     });
@@ -640,9 +689,11 @@ exports.GoogleCalendarDatasource = GoogleCalendarDatasource;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.AnnotationsQueryCtrl = exports.ConfigCtrl = exports.Datasource = undefined;
+exports.AnnotationsQueryCtrl = exports.QueryCtrl = exports.ConfigCtrl = exports.Datasource = undefined;
 
 var _datasource = __webpack_require__(/*! ./datasource */ "./datasource.ts");
+
+var _query_ctrl = __webpack_require__(/*! ./query_ctrl */ "./query_ctrl.ts");
 
 var _annotations_query_ctrl = __webpack_require__(/*! ./annotations_query_ctrl */ "./annotations_query_ctrl.ts");
 
@@ -657,7 +708,82 @@ function () {
 
 exports.Datasource = _datasource.GoogleCalendarDatasource;
 exports.ConfigCtrl = GoogleCalendarConfigCtrl;
+exports.QueryCtrl = _query_ctrl.GoogleCalendarQueryCtrl;
 exports.AnnotationsQueryCtrl = _annotations_query_ctrl.GoogleCalendarAnnotationsQueryCtrl;
+
+/***/ }),
+
+/***/ "./query_ctrl.ts":
+/*!***********************!*\
+  !*** ./query_ctrl.ts ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.GoogleCalendarQueryCtrl = undefined;
+
+var _sdk = __webpack_require__(/*! grafana/app/plugins/sdk */ "grafana/app/plugins/sdk");
+
+var __extends = undefined && undefined.__extends || function () {
+  var extendStatics = Object.setPrototypeOf || {
+    __proto__: []
+  } instanceof Array && function (d, b) {
+    d.__proto__ = b;
+  } || function (d, b) {
+    for (var p in b) {
+      if (b.hasOwnProperty(p)) d[p] = b[p];
+    }
+  };
+
+  return function (d, b) {
+    extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var GoogleCalendarQueryCtrl =
+/** @class */
+function (_super) {
+  __extends(GoogleCalendarQueryCtrl, _super);
+
+  function GoogleCalendarQueryCtrl($scope, $injector) {
+    var _this = _super.call(this, $scope, $injector) || this;
+
+    _this.scope = $scope;
+    return _this;
+  }
+
+  GoogleCalendarQueryCtrl.prototype.onChangeInternal = function () {
+    this.panelCtrl.refresh();
+  };
+
+  GoogleCalendarQueryCtrl.templateUrl = 'partials/query.editor.html';
+  return GoogleCalendarQueryCtrl;
+}(_sdk.QueryCtrl);
+
+exports.GoogleCalendarQueryCtrl = GoogleCalendarQueryCtrl;
+
+/***/ }),
+
+/***/ "grafana/app/core/table_model":
+/*!***************************************!*\
+  !*** external "app/core/table_model" ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_grafana_app_core_table_model__;
 
 /***/ }),
 
@@ -669,6 +795,17 @@ exports.AnnotationsQueryCtrl = _annotations_query_ctrl.GoogleCalendarAnnotations
 /***/ (function(module, exports) {
 
 module.exports = __WEBPACK_EXTERNAL_MODULE_grafana_app_core_utils_datemath__;
+
+/***/ }),
+
+/***/ "grafana/app/plugins/sdk":
+/*!**********************************!*\
+  !*** external "app/plugins/sdk" ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_grafana_app_plugins_sdk__;
 
 /***/ }),
 
