@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import * as dateMath from 'grafana/app/core/utils/datemath';
+import TableModel from 'grafana/app/core/table_model';
 import scriptjs from 'scriptjs';
 
 export class GoogleCalendarDatasource {
@@ -81,6 +82,51 @@ export class GoogleCalendarDatasource {
       }, err => {
         console.log(err);
         throw { message: 'failed to initialize' };
+      });
+    });
+  }
+
+  query(options) {
+    return this.initialize().then(() => {
+      return Promise.all(
+        options.targets
+          .filter((t) => !t.hide)
+          .map((t) => {
+            let params = {
+              'calendarId': t.calendarId,
+              'timeMin': options.range.from.toISOString(),
+              'timeMax': options.range.to.toISOString(),
+              'orderBy': 'startTime',
+              'showDeleted': false,
+              'singleEvents': true,
+              'maxResults': 250
+            };
+            return this.getEvents(params).then(events => {
+              return events.sort((a, b) => {
+                return moment(a.start.dateTime || a.start.date) > moment(b.start.dateTime || b.start.date);
+              });
+            });
+          })
+      ).then((eventsList) => {
+        let table = new TableModel();
+        table.columns = ['startTime', 'endTime', 'summary', 'displayName', 'description'].map((c) => { return { text: c } });
+        _.each(eventsList, (events) => {
+          _.each(events, (event: any) => {
+            const start = event.start.dateTime || event.start.date;
+            const end = event.end.dateTime || event.end.date;
+            const row = [
+              start,
+              end,
+              event.summary,
+              event.organizer.displayName,
+              event.description || ''
+            ];
+            table.rows.push(row);
+          });
+        });
+        return {
+          data: [table]
+        };
       });
     });
   }
