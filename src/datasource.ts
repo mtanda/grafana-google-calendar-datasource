@@ -112,8 +112,8 @@ export class GoogleCalendarDatasource {
         table.columns = ['startTime', 'endTime', 'summary', 'displayName', 'description'].map((c) => { return { text: c } });
         _.each(eventsList, (events) => {
           _.each(events, (event: any) => {
-            const start = event.start.dateTime || event.start.date;
-            const end = event.end.dateTime || event.end.date;
+            const start = moment(event.start.dateTime || event.start.date).valueOf();
+            const end = moment(event.end.dateTime || event.end.date).valueOf();
             const row = [
               start,
               end,
