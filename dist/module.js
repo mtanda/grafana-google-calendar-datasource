@@ -414,8 +414,8 @@ function () {
 
         _lodash2.default.each(eventsList, function (events) {
           _lodash2.default.each(events, function (event) {
-            var start = event.start.dateTime || event.start.date;
-            var end = event.end.dateTime || event.end.date;
+            var start = (0, _moment2.default)(event.start.dateTime || event.start.date).valueOf();
+            var end = (0, _moment2.default)(event.end.dateTime || event.end.date).valueOf();
             var row = [start, end, event.summary, event.organizer.displayName, event.description || ''];
             table.rows.push(row);
           });
