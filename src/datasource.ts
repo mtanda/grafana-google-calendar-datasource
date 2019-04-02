@@ -282,24 +282,39 @@ export class GoogleCalendarDatasource {
             var start = moment(event.start.dateTime || event.start.date);
             var end = moment(event.end.dateTime || event.end.date);
 
-            return [
-              {
-                regionId: event.id,
-                annotation: annotation,
-                time: start.valueOf(),
-                title: event.summary,
-                tags: ['Google Calender', event.organizer.displayName],
-                text: event.description ? event.description : "",
-              },
-              {
-                regionId: event.id,
-                annotation: annotation,
-                time: end.valueOf(),
-                title: event.summary,
-                tags: ['Google Calendar', event.organizer.displayName],
-                text: event.description ? event.description : "",
-              }
-            ];
+            if (true) {
+              return [
+                {
+                  regionId: event.id,
+                  annotation: annotation,
+                  isRegion: true,
+                  time: start.valueOf(),
+                  timeEnd: end.valueOf(),
+                  title: event.summary,
+                  tags: ['Google Calender', event.organizer.displayName],
+                  text: event.description ? event.description : "",
+                }
+              ];
+            } else {
+              return [
+                {
+                  regionId: event.id,
+                  annotation: annotation,
+                  time: start.valueOf(),
+                  title: event.summary,
+                  tags: ['Google Calender', event.organizer.displayName],
+                  text: event.description ? event.description : "",
+                },
+                {
+                  regionId: event.id,
+                  annotation: annotation,
+                  time: end.valueOf(),
+                  title: event.summary,
+                  tags: ['Google Calendar', event.organizer.displayName],
+                  text: event.description ? event.description : "",
+                }
+              ];
+            }
           }).flatten().value();
 
         return result;
