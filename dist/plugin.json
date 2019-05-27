@@ -9,6 +9,7 @@
 
   "metrics": true,
   "annotations": true,
+  "hiddenQueries": true,
   "backend": true,
   "executable": "google-calendar-plugin",
 
