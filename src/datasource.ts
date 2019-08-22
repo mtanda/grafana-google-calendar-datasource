@@ -25,7 +25,7 @@ export class GoogleCalendarDatasource {
     this.access = instanceSettings.jsonData.access || 'direct';
     this.clientId = instanceSettings.jsonData.clientId;
     this.scopes = 'https://www.googleapis.com/auth/calendar.readonly';
-    this.discoveryDocs = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+    this.discoveryDocs = ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'];
     this.q = $q;
     this.templateSrv = templateSrv;
     this.timeSrv = timeSrv;
@@ -44,12 +44,14 @@ export class GoogleCalendarDatasource {
   }
 
   testDatasource() {
-    return this.initialize().then(() => {
-      return { status: 'success', message: 'Data source is working', title: 'Success' };
-    }).catch(err => {
-      console.log(err);
-      return { status: "error", message: err.message, title: "Error" };
-    });
+    return this.initialize()
+      .then(() => {
+        return { status: 'success', message: 'Data source is working', title: 'Success' };
+      })
+      .catch(err => {
+        console.log(err);
+        return { status: 'error', message: err.message, title: 'Error' };
+      });
   }
 
   initialize() {
@@ -61,28 +63,33 @@ export class GoogleCalendarDatasource {
     }
 
     return this.load().then(() => {
-      return gapi.client.init({
-        clientId: this.clientId,
-        scope: this.scopes,
-        discoveryDocs: this.discoveryDocs
-      }).then(() => {
-        let authInstance = gapi.auth2.getAuthInstance();
-        if (!authInstance) {
-          throw { message: 'failed to initialize' };
-        }
-        let isSignedIn = authInstance.isSignedIn.get();
-        if (isSignedIn) {
-          this.initialized = true;
-          return authInstance.currentUser.get();
-        }
-        return authInstance.signIn().then(user => {
-          this.initialized = true;
-          return user;
-        });
-      }, err => {
-        console.log(err);
-        throw { message: 'failed to initialize' };
-      });
+      return gapi.client
+        .init({
+          clientId: this.clientId,
+          scope: this.scopes,
+          discoveryDocs: this.discoveryDocs,
+        })
+        .then(
+          () => {
+            let authInstance = gapi.auth2.getAuthInstance();
+            if (!authInstance) {
+              throw { message: 'failed to initialize' };
+            }
+            let isSignedIn = authInstance.isSignedIn.get();
+            if (isSignedIn) {
+              this.initialized = true;
+              return authInstance.currentUser.get();
+            }
+            return authInstance.signIn().then(user => {
+              this.initialized = true;
+              return user;
+            });
+          },
+          err => {
+            console.log(err);
+            throw { message: 'failed to initialize' };
+          }
+        );
     });
   }
 
@@ -90,16 +97,16 @@ export class GoogleCalendarDatasource {
     return this.initialize().then(() => {
       return Promise.all(
         options.targets
-          .filter((t) => !t.hide)
-          .map((t) => {
+          .filter(t => !t.hide)
+          .map(t => {
             let params = {
-              'calendarId': t.calendarId,
-              'timeMin': options.range.from.toISOString(),
-              'timeMax': options.range.to.toISOString(),
-              'orderBy': 'startTime',
-              'showDeleted': false,
-              'singleEvents': true,
-              'maxResults': 250
+              calendarId: t.calendarId,
+              timeMin: options.range.from.toISOString(),
+              timeMax: options.range.to.toISOString(),
+              orderBy: 'startTime',
+              showDeleted: false,
+              singleEvents: true,
+              maxResults: 250,
             };
             return this.getEvents(params).then(events => {
               return events.sort((a, b) => {
@@ -107,25 +114,21 @@ export class GoogleCalendarDatasource {
               });
             });
           })
-      ).then((eventsList) => {
+      ).then(eventsList => {
         let table = new TableModel();
-        table.columns = ['startTime', 'endTime', 'summary', 'displayName', 'description'].map((c) => { return { text: c } });
-        _.each(eventsList, (events) => {
+        table.columns = ['startTime', 'endTime', 'summary', 'displayName', 'description'].map(c => {
+          return { text: c };
+        });
+        _.each(eventsList, events => {
           _.each(events, (event: any) => {
             const start = moment(event.start.dateTime || event.start.date).valueOf();
             const end = moment(event.end.dateTime || event.end.date).valueOf();
-            const row = [
-              start,
-              end,
-              event.summary,
-              event.organizer.displayName,
-              event.description || ''
-            ];
+            const row = [start, end, event.summary, event.organizer.displayName, event.description || ''];
             table.rows.push(row);
           });
         });
         return {
-          data: [table]
+          data: [table],
         };
       });
     });
@@ -140,19 +143,21 @@ export class GoogleCalendarDatasource {
         let fieldPath = eventsQuery[3];
         let filter = eventsQuery[4];
         let params = {
-          'calendarId': calendarId,
-          'timeMin': timeRange.from.toISOString(),
-          'timeMax': timeRange.to.toISOString(),
-          'orderBy': 'startTime',
-          'q': filter,
-          'showDeleted': false,
-          'singleEvents': true,
-          'maxResults': 250,
+          calendarId: calendarId,
+          timeMin: timeRange.from.toISOString(),
+          timeMax: timeRange.to.toISOString(),
+          orderBy: 'startTime',
+          q: filter,
+          showDeleted: false,
+          singleEvents: true,
+          maxResults: 250,
         };
         return this.getEvents(params).then(events => {
-          return this.q.when(events.map(event => {
-            return { text: _.get(event, fieldPath) };
-          }));
+          return this.q.when(
+            events.map(event => {
+              return { text: _.get(event, fieldPath) };
+            })
+          );
         });
       }
 
@@ -164,14 +169,14 @@ export class GoogleCalendarDatasource {
         let offset = parseInt(startEndQuery[5], 10);
         let filter = startEndQuery[6];
         let params = {
-          'calendarId': calendarId,
-          'timeMin': timeRange.from.toISOString(),
-          'timeMax': timeRange.to.toISOString(),
-          'orderBy': 'startTime',
-          'q': filter,
-          'showDeleted': false,
-          'singleEvents': true,
-          'maxResults': 250,
+          calendarId: calendarId,
+          timeMin: timeRange.from.toISOString(),
+          timeMax: timeRange.to.toISOString(),
+          orderBy: 'startTime',
+          q: filter,
+          showDeleted: false,
+          singleEvents: true,
+          maxResults: 250,
         };
         return this.getEvents(params).then(events => {
           events.sort((a, b) => {
@@ -203,14 +208,14 @@ export class GoogleCalendarDatasource {
         let offset = parseInt(rangeQuery[4], 10);
         let filter = rangeQuery[5];
         let params = {
-          'calendarId': calendarId,
-          'timeMin': timeRange.from.toISOString(),
-          'timeMax': timeRange.to.toISOString(),
-          'orderBy': 'startTime',
-          'q': filter,
-          'showDeleted': false,
-          'singleEvents': true,
-          'maxResults': 250,
+          calendarId: calendarId,
+          timeMin: timeRange.from.toISOString(),
+          timeMax: timeRange.to.toISOString(),
+          orderBy: 'startTime',
+          q: filter,
+          showDeleted: false,
+          singleEvents: true,
+          maxResults: 250,
         };
         return this.getEvents(params).then(events => {
           events.sort((a, b) => {
@@ -267,18 +272,18 @@ export class GoogleCalendarDatasource {
     return this.initialize().then(() => {
       return (() => {
         let params = {
-          'calendarId': calendarId,
-          'timeMin': options.range.from.toISOString(),
-          'timeMax': options.range.to.toISOString(),
-          'orderBy': 'startTime',
-          'showDeleted': false,
-          'singleEvents': true,
-          'maxResults': 250
+          calendarId: calendarId,
+          timeMin: options.range.from.toISOString(),
+          timeMax: options.range.to.toISOString(),
+          orderBy: 'startTime',
+          showDeleted: false,
+          singleEvents: true,
+          maxResults: 250,
         };
         return this.getEvents(params);
-      })().then((events) => {
+      })().then(events => {
         var result = _.chain(events)
-          .map((event) => {
+          .map(event => {
             var start = moment(event.start.dateTime || event.start.date);
             var end = moment(event.end.dateTime || event.end.date);
 
@@ -289,7 +294,7 @@ export class GoogleCalendarDatasource {
                 time: start.valueOf(),
                 title: event.summary,
                 tags: ['Google Calender', event.organizer.displayName],
-                text: event.description ? event.description : "",
+                text: event.description ? event.description : '',
               },
               {
                 regionId: event.id,
@@ -297,10 +302,12 @@ export class GoogleCalendarDatasource {
                 time: end.valueOf(),
                 title: event.summary,
                 tags: ['Google Calendar', event.organizer.displayName],
-                text: event.description ? event.description : "",
-              }
+                text: event.description ? event.description : '',
+              },
             ];
-          }).flatten().value();
+          })
+          .flatten()
+          .value();
 
         return result;
       });
@@ -317,30 +324,35 @@ export class GoogleCalendarDatasource {
           method: 'POST',
           data: {
             queries: [
-              _.extend({
-                queryType: 'raw',
-                api: 'calendar.events.list',
-                refId: '',
-                datasourceId: this.id
-              }, params)
-            ]
-          }
+              _.extend(
+                {
+                  queryType: 'raw',
+                  api: 'calendar.events.list',
+                  refId: '',
+                  datasourceId: this.id,
+                },
+                params
+              ),
+            ],
+          },
         });
       }
-    })().then(response => {
-      return this.access != 'proxy' ? response.result.items : response.data.results[''].meta.items;
-    }).catch(err => {
-      if (this.access != 'proxy') {
-        throw err;
-      } else {
-        throw {
-          body: JSON.stringify({
-            error: {
-              message: err.data.results[""].error
-            }
-          })
-        };
-      }
-    });
+    })()
+      .then(response => {
+        return this.access != 'proxy' ? response.result.items : response.data.results[''].meta.items;
+      })
+      .catch(err => {
+        if (this.access != 'proxy') {
+          throw err;
+        } else {
+          throw {
+            body: JSON.stringify({
+              error: {
+                message: err.data.results[''].error,
+              },
+            }),
+          };
+        }
+      });
   }
 }

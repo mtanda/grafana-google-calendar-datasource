@@ -10,5 +10,5 @@ export {
   GoogleCalendarDatasource as Datasource,
   GoogleCalendarConfigCtrl as ConfigCtrl,
   GoogleCalendarQueryCtrl as QueryCtrl,
-  GoogleCalendarAnnotationsQueryCtrl as AnnotationsQueryCtrl
+  GoogleCalendarAnnotationsQueryCtrl as AnnotationsQueryCtrl,
 };

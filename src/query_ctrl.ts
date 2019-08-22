@@ -14,4 +14,3 @@ export class GoogleCalendarQueryCtrl extends QueryCtrl {
     this.panelCtrl.refresh();
   }
 }
-
