@@ -55,7 +55,7 @@ export class GoogleCalendarDatasource {
   }
 
   initialize() {
-    if (this.access == 'proxy') {
+    if (this.access === 'proxy') {
       return Promise.resolve([]);
     }
     if (this.initialized) {
@@ -316,7 +316,7 @@ export class GoogleCalendarDatasource {
 
   getEvents(params) {
     return (() => {
-      if (this.access != 'proxy') {
+      if (this.access !== 'proxy') {
         return gapi.client.calendar.events.list(params);
       } else {
         return this.backendSrv.datasourceRequest({
@@ -339,10 +339,10 @@ export class GoogleCalendarDatasource {
       }
     })()
       .then(response => {
-        return this.access != 'proxy' ? response.result.items : response.data.results[''].meta.items;
+        return this.access !== 'proxy' ? response.result.items : response.data.results[''].meta.items;
       })
       .catch(err => {
-        if (this.access != 'proxy') {
+        if (this.access !== 'proxy') {
           throw err;
         } else {
           throw {
