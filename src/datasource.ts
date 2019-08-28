@@ -35,7 +35,7 @@ export class GoogleCalendarDatasource {
   }
 
   load() {
-    let deferred = this.q.defer();
+    const deferred = this.q.defer();
     scriptjs('https://apis.google.com/js/api.js', () => {
       gapi.load('client:auth2', () => {
         return deferred.resolve();
@@ -72,11 +72,11 @@ export class GoogleCalendarDatasource {
         })
         .then(
           () => {
-            let authInstance = gapi.auth2.getAuthInstance();
+            const authInstance = gapi.auth2.getAuthInstance();
             if (!authInstance) {
               throw { message: 'failed to initialize' };
             }
-            let isSignedIn = authInstance.isSignedIn.get();
+            const isSignedIn = authInstance.isSignedIn.get();
             if (isSignedIn) {
               this.initialized = true;
               return authInstance.currentUser.get();
@@ -100,7 +100,7 @@ export class GoogleCalendarDatasource {
         options.targets
           .filter(t => !t.hide)
           .map(t => {
-            let params = {
+            const params = {
               calendarId: t.calendarId,
               timeMin: options.range.from.toISOString(),
               timeMax: options.range.to.toISOString(),
@@ -116,7 +116,7 @@ export class GoogleCalendarDatasource {
             });
           })
       ).then(eventsList => {
-        let table = new TableModel();
+        const table = new TableModel();
         table.columns = ['startTime', 'endTime', 'summary', 'displayName', 'description'].map(c => {
           return { text: c };
         });
@@ -137,13 +137,13 @@ export class GoogleCalendarDatasource {
 
   metricFindQuery(query) {
     return this.initialize().then(() => {
-      let timeRange = this.timeSrv.timeRange();
-      let eventsQuery = query.match(/^events\((([^,]+), *)?([^,]+), *([^,]+)\)/);
+      const timeRange = this.timeSrv.timeRange();
+      const eventsQuery = query.match(/^events\((([^,]+), *)?([^,]+), *([^,]+)\)/);
       if (eventsQuery) {
-        let calendarId = eventsQuery[2];
-        let fieldPath = eventsQuery[3];
-        let filter = eventsQuery[4];
-        let params = {
+        const calendarId = eventsQuery[2];
+        const fieldPath = eventsQuery[3];
+        const filter = eventsQuery[4];
+        const params = {
           calendarId: calendarId,
           timeMin: timeRange.from.toISOString(),
           timeMax: timeRange.to.toISOString(),
@@ -162,14 +162,14 @@ export class GoogleCalendarDatasource {
         });
       }
 
-      let startEndQuery = query.match(/^(start|end)\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
+      const startEndQuery = query.match(/^(start|end)\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
       if (startEndQuery) {
-        let key = startEndQuery[1] === 'start' ? 'start' : 'end';
-        let calendarId = startEndQuery[3];
-        let format = startEndQuery[4];
-        let offset = parseInt(startEndQuery[5], 10);
-        let filter = startEndQuery[6];
-        let params = {
+        const key = startEndQuery[1] === 'start' ? 'start' : 'end';
+        const calendarId = startEndQuery[3];
+        const format = startEndQuery[4];
+        const offset = parseInt(startEndQuery[5], 10);
+        const filter = startEndQuery[6];
+        const params = {
           calendarId: calendarId,
           timeMin: timeRange.from.toISOString(),
           timeMax: timeRange.to.toISOString(),
@@ -183,8 +183,8 @@ export class GoogleCalendarDatasource {
           events.sort((a, b) => {
             return moment(a.start.dateTime || a.start.date) > moment(b.start.dateTime || b.start.date);
           });
-          let lastIndex = 0;
-          let index = lastIndex - offset;
+          const lastIndex = 0;
+          const index = lastIndex - offset;
           if (index < 0 || index >= events.length) {
             return {};
           }
@@ -202,13 +202,13 @@ export class GoogleCalendarDatasource {
         });
       }
 
-      let rangeQuery = query.match(/^range\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
+      const rangeQuery = query.match(/^range\((([^,]+), *)?([^,]+), *([^,]+), *([^,]+)\)/);
       if (rangeQuery) {
-        let calendarId = rangeQuery[2];
-        let format = rangeQuery[3];
-        let offset = parseInt(rangeQuery[4], 10);
-        let filter = rangeQuery[5];
-        let params = {
+        const calendarId = rangeQuery[2];
+        const format = rangeQuery[3];
+        const offset = parseInt(rangeQuery[4], 10);
+        const filter = rangeQuery[5];
+        const params = {
           calendarId: calendarId,
           timeMin: timeRange.from.toISOString(),
           timeMax: timeRange.to.toISOString(),
@@ -222,13 +222,13 @@ export class GoogleCalendarDatasource {
           events.sort((a, b) => {
             return moment(a.start.dateTime || a.start.date) > moment(b.start.dateTime || b.start.date);
           });
-          let lastIndex = 0;
-          let index = lastIndex - offset;
+          const lastIndex = 0;
+          const index = lastIndex - offset;
           if (index < 0 || index >= events.length) {
             return {};
           }
-          let end = moment(events[index].end.dateTime || events[index].end.date);
-          let start = moment(events[index].start.dateTime || events[index].start.date);
+          const end = moment(events[index].end.dateTime || events[index].end.date);
+          const start = moment(events[index].start.dateTime || events[index].start.date);
           let range;
           if (format === 'offset' || format === '-offset') {
             range = Math.floor(moment.duration(end.diff(start)).asSeconds());
@@ -241,10 +241,10 @@ export class GoogleCalendarDatasource {
         });
       }
 
-      let dateMathQuery = query.match(/^datemath\(([^,]+), *([^,]+)\)/);
+      const dateMathQuery = query.match(/^datemath\(([^,]+), *([^,]+)\)/);
       if (dateMathQuery) {
-        let expression = dateMathQuery[1];
-        let format = dateMathQuery[2];
+        const expression = dateMathQuery[1];
+        const format = dateMathQuery[2];
         let date = dateMath.parse(expression, false);
         if (format === 'offset' || format === '-offset') {
           date = Math.floor(moment.duration(timeRange.to.diff(date)).asSeconds());
@@ -263,8 +263,8 @@ export class GoogleCalendarDatasource {
   }
 
   annotationQuery(options) {
-    var annotation = options.annotation;
-    var calendarId = annotation.calendarId;
+    const annotation = options.annotation;
+    const calendarId = annotation.calendarId;
 
     if (_.isEmpty(calendarId)) {
       return this.q.when([]);
@@ -272,7 +272,7 @@ export class GoogleCalendarDatasource {
 
     return this.initialize().then(() => {
       return (() => {
-        let params = {
+        const params = {
           calendarId: calendarId,
           timeMin: options.range.from.toISOString(),
           timeMax: options.range.to.toISOString(),
@@ -283,10 +283,10 @@ export class GoogleCalendarDatasource {
         };
         return this.getEvents(params);
       })().then(events => {
-        var result = _.chain(events)
+        const result = _.chain(events)
           .map(event => {
-            var start = moment(event.start.dateTime || event.start.date);
-            var end = moment(event.end.dateTime || event.end.date);
+            const start = moment(event.start.dateTime || event.start.date);
+            const end = moment(event.end.dateTime || event.end.date);
 
             return [
               {
