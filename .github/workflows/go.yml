@@ -1,5 +1,5 @@
 name: Go
-on: [push]
+on: [release]
 jobs:
   build:
     name: Build
@@ -32,3 +32,10 @@ jobs:
 
       - name: Package
         run: npx grafana-toolkit plugin:ci-package
+
+      - name: Publish
+        uses: Shopify/upload-to-release@master
+        with:
+          name: grafana-google-calendar-datasource-${{github.event.release.tag_name}}.zip
+          path: ci/packages/mtanda-google-calendar-datasource-${{github.event.release.tag_name}}.zip
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
