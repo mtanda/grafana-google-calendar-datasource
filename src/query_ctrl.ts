@@ -5,6 +5,7 @@ export class GoogleCalendarQueryCtrl extends QueryCtrl {
   panelCtrl: any;
   static templateUrl = 'partials/query.editor.html';
 
+  /** @ngInject */
   constructor($scope, $injector) {
     super($scope, $injector);
     this.scope = $scope;

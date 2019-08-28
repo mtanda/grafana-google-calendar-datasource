@@ -18,6 +18,7 @@ export class GoogleCalendarDatasource {
   backendSrv: any;
   initialized: boolean;
 
+  /** @ngInject */
   constructor(instanceSettings, $q, templateSrv, timeSrv, backendSrv) {
     this.type = instanceSettings.type;
     this.name = instanceSettings.name;
