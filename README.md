@@ -8,11 +8,18 @@ For each event, start time / end time annotation is displayed.
 
 ### Setup
 
-To use this plugin, you need to get client ID which allow to call Google Calendar API.
+To use this plugin, you need to get Client ID and OAuth 2.0 credentials which allow to call Google Calendar API
+by JavaScript.
 
-Please follow [Quickstart Step 1](https://developers.google.com/google-apps/calendar/quickstart/js).
+Please follow [Quickstart Step 1](https://developers.google.com/google-apps/calendar/quickstart/js) to enable
+Google Calendar API and create new web application project. Copy the Client ID into the datasource config.
 
-After get the client ID, set the ID to datasource config.
+Next add [Authorized Domain](https://support.google.com/cloud/answer/6158849?hl=en#authorized-domains) for 
+OAuth 2.0 under [Google Developer Console](https://console.developers.google.com/project) > 
+APIs & Services > OAuth consent screen.
+
+Finally put Grafana path into [Authorized JavaScript Origins](https://support.google.com/cloud/answer/6158849?hl=en#web-applications)
+under Google Developer Console > Credentials > [your project name] > Authorized JavaScript Origins.
 
 ### Options
 
