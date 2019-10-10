@@ -98,7 +98,7 @@ export class GoogleCalendarDatasource {
     return this.initialize().then(() => {
       return Promise.all(
         options.targets
-          .filter(t => !t.hide)
+          .filter(t => !t.hide && t.calendarId)
           .map(t => {
             const params = {
               calendarId: t.calendarId,
