@@ -3,7 +3,7 @@ import { QueryCtrl } from 'grafana/app/plugins/sdk';
 export class GoogleCalendarQueryCtrl extends QueryCtrl {
   scope: any;
   panelCtrl: any;
-  static templateUrl = 'partials/query.editor.html';
+  static templateUrl = 'query.editor.html';
 
   /** @ngInject */
   constructor($scope, $injector) {

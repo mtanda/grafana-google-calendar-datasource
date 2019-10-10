@@ -4,7 +4,7 @@
   "type": "datasource",
 
   "partials": {
-    "config": "public/app/plugins/datasource/mtanda-google-calendar-datasource/partials/config.html"
+    "config": "public/app/plugins/datasource/mtanda-google-calendar-datasource/config.html"
   },
 
   "metrics": true,

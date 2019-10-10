@@ -1,6 +1,6 @@
 export class GoogleCalendarAnnotationsQueryCtrl {
   scope: any;
-  static templateUrl = 'partials/annotations.editor.html';
+  static templateUrl = 'annotations.editor.html';
 
   /** @ngInject */
   constructor($scope, $injector) {

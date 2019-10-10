@@ -3,7 +3,7 @@ import { GoogleCalendarQueryCtrl } from './query_ctrl';
 import { GoogleCalendarAnnotationsQueryCtrl } from './annotations_query_ctrl';
 
 class GoogleCalendarConfigCtrl {
-  static templateUrl = 'partials/config.html';
+  static templateUrl = 'config.html';
 }
 
 export {
