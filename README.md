@@ -7,6 +7,7 @@ For each event, start time / end time annotation is displayed.
 ![](https://raw.githubusercontent.com/mtanda/grafana-google-calendar-datasource/master/dist/images/calendar.png)
 
 ### Setup
+Follow [Installing Plugins Manually](https://grafana.com/docs/plugins/installation/) steps, and install plugin from released zip file.
 
 To use this plugin, you need to get Client ID and OAuth 2.0 credentials which allow to call Google Calendar API
 by JavaScript.
