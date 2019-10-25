@@ -10,7 +10,7 @@ import (
 	"golang.org/x/oauth2/google"
 	calendar "google.golang.org/api/calendar/v3"
 
-	"github.com/grafana/grafana_plugin_model/go/datasource"
+	"github.com/grafana/grafana-plugin-model/go/datasource"
 	plugin "github.com/hashicorp/go-plugin"
 )
 
