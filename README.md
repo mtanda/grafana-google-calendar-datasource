@@ -4,7 +4,7 @@ This plugin provide annotation data of Google Calendar Events.
 
 For each event, start time / end time annotation is displayed.
 
-![](https://raw.githubusercontent.com/mtanda/grafana-google-calendar-datasource/master/dist/images/calendar.png)
+![](https://raw.githubusercontent.com/mtanda/grafana-google-calendar-datasource/master/src/images/calendar.png)
 
 ### Setup
 Follow [Installing Plugins Manually](https://grafana.com/docs/plugins/installation/) steps, and install plugin from released zip file.
@@ -28,7 +28,7 @@ For each annotation, you need to set calendar ID.
 
 The calendar ID is found at `Calendar settings` page.
 
-![](https://raw.githubusercontent.com/mtanda/grafana-google-calendar-datasource/master/dist/images/annotation_config.png)
+![](https://raw.githubusercontent.com/mtanda/grafana-google-calendar-datasource/master/src/images/annotation_config.png)
 
 At first time, you need to accept to open this popup window, and accept to use API.
 
