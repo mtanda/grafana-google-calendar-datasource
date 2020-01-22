@@ -25,12 +25,12 @@
     "screenshots": [
       {"name": "Calendar", "path": "images/calendar.png"}
     ],
-    "version": "1.0.7",
-    "updated": "2019-10-10"
+    "version": "1.0.8",
+    "updated": "2020-01-22"
   },
 
   "dependencies": {
-    "grafanaVersion": "3.x.x",
+    "grafanaVersion": "6.5.x",
     "plugins": [ ]
   }
 }
