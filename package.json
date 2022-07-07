@@ -14,7 +14,7 @@
     "@types/gapi.auth2": "0.0.50",
     "@types/gapi.calendar": "^3.0.3",
     "lodash": "^4.17.19",
-    "moment": "^2.22.1",
+    "moment": "^2.29.4",
     "rxjs": "^6.2.1",
     "rxjs-compat": "^6.2.1",
     "scriptjs": "^2.5.9"
