@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "@grafana/data": "^6.5.3",
-    "@grafana/toolkit": "^6.5.3",
-    "@grafana/ui": "^6.5.3",
+    "@grafana/toolkit": "^9.3.2",
+    "@grafana/ui": "^9.3.2",
     "@types/grafana": "https://git@github.com/CorpGlory/types-grafana.git",
     "@types/jest": "^24.0.17",
     "@types/lodash": "^4.14.136",
